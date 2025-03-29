@@ -2,8 +2,10 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 from fpdf import FPDF
 import os
+import Ratios as ratios
+import excel as e
 
-# Define helper functions
+# Define helper functions 
 def calculate_dividend_yield(dividend, price):
     return dividend / price if dividend and price else 0
 
@@ -65,7 +67,7 @@ try:
     pdf.ln(10)
     pdf.set_font("Arial", size=18)
     pdf.cell(200, 10, txt=f"Company: {TICKER}", ln=True, align="C")
-    pdf.image(chart_file, x=60, y=50, w=90)  # Add company logo or chart
+    pdf.image(chart_file, x=60, y=50, w=90)
     pdf.ln(100)
     pdf.set_font("Arial", size=12)
     pdf.cell(200, 10, txt="Prepared by: .json Pty. Ltd.", ln=True, align="C")
@@ -79,7 +81,8 @@ try:
     pdf.set_font("Arial", size=12)
     pdf.cell(200, 10, txt="1. Financial Metrics", ln=True, align="L")
     pdf.cell(200, 10, txt="2. Stock Price Chart", ln=True, align="L")
-    pdf.cell(200, 10, txt="3. Disclaimer", ln=True, align="L")
+    pdf.cell(200, 10, txt="3. DCF Model Extract", ln=True, align="L")
+    pdf.cell(200, 10, txt="4. Disclaimer", ln=True, align="L")
 
     # Financial Metrics Section
     pdf.add_page()
@@ -100,10 +103,34 @@ try:
     pdf.ln(10)
     pdf.image(chart_file, x=10, y=30, w=190)
 
+    # DCF Model Extract Section
+    pdf.add_page()
+    pdf.set_font("Arial", size=16, style="B")
+    pdf.cell(200, 10, txt="3. DCF Model Extract", ln=True, align="L")
+    pdf.ln(10)
+
+    dcf_df = e.get_dcf_extract()
+    if not dcf_df.empty:
+        col_width = pdf.w / (len(dcf_df.columns) + 1)
+        row_height = 8
+
+        pdf.set_font("Arial", 'B', 10)
+        for column in dcf_df.columns:
+            pdf.cell(col_width, row_height, str(column), border=1, align='C')
+        pdf.ln(row_height)
+        pdf.set_font("Arial", '', 10)
+        for index, row in dcf_df.iterrows():
+            for item in row:
+                pdf.cell(col_width, row_height, str(item), border=1)
+            pdf.ln(row_height)
+    else:
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt="DCF data not available.", ln=True, align="L")
+
     # Disclaimer Section
     pdf.add_page()
     pdf.set_font("Arial", size=16, style="B")
-    pdf.cell(200, 10, txt="3. Disclaimer", ln=True, align="L")
+    pdf.cell(200, 10, txt="4. Disclaimer", ln=True, align="L")
     pdf.ln(10)
     pdf.set_font("Arial", size=12)
     pdf.multi_cell(0, 10, txt="This report is for informational purposes only and does not constitute financial advice. "
