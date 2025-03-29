@@ -2,31 +2,18 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 from fpdf import FPDF
 import os
-import ratios_james as ratios
-import excel as e
+import pandas as pd
 
 
-def stock_price_chart(TICKER: str):
-    # Get stock information
-    stock = yf.Ticker(TICKER)
-    stock_prices = stock.history(period="10y")
-    
-
-    # Plot the stock prices
-    chart_file = f"{TICKER}_chart.png"
-    plt.figure(figsize=(10, 5))
-    plt.plot(stock_prices['Close'], label="Stock Price")
-    plt.title(f"{TICKER} Stock Prices")
+def stock_price_chart():
+    price_data = pd.read_csv("CBA.csv", parse_dates=["Date"])
+    plt.figure(figsize=(6, 2))
+    plt.plot(price_data['Date'], price_data['Close'])
+    plt.title("CBA Historical Price")
     plt.xlabel("Date")
-    plt.ylabel("Price")
-    plt.legend()
-    plt.grid()
-    plt.savefig(chart_file)  # Save the chart as an image
+    plt.ylabel("Close")
+    plt.tight_layout()
+    chart_path = "price_chart.png"
+    plt.savefig(chart_path)
     plt.close()
-
    
-
-    # Clean up the chart image
-    if os.path.exists(chart_file):
-        os.remove(chart_file)
-

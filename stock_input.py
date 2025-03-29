@@ -1,7 +1,6 @@
 import ipywidgets as widgets
 from IPython.display import display
 
-
 # Create a text input widget
 stock_code_input = widgets.Text(
     value='',
@@ -22,13 +21,19 @@ submit_button = widgets.Button(
 # Create an output widget
 output = widgets.Output()
 
+# Variable to store the stock code
+stock_code_value = None
+
 # Define the function to handle button click
 def on_button_click(b):
+    global stock_code_value
     with output:
         output.clear_output()
-        stock_code = stock_code_input.value
+        stock_code_value = stock_code_input.value
+        print(f"Stock code entered: {stock_code_value}")
 
-        print('tbc')
+def get_stock_code():
+    return stock_code_value
 # Attach the function to the button click event
 submit_button.on_click(on_button_click)
 
